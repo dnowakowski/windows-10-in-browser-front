@@ -6,17 +6,17 @@ var d = new Date();
 var hours= d.getHours();
 var minutes=d.getMinutes();
 if(hours<10){
-hours="0"+hours;
+	hours="0"+hours;
 }
 if(minutes<10){
-minutes="0"+minutes;
+	minutes="0"+minutes;
 }
    document.getElementById("timer").innerHTML = hours+":"+minutes;
 },60);
 
 //rest
-let icons = document.querySelectorAll('.icoBox');
-let pulpit = document.querySelector('body');
+let icons = Array.from(document.querySelectorAll('.icoBox'));
+let body = document.querySelector('body');
 let clicked = false;
 let heldIcon;
 let heldIconP;
@@ -26,20 +26,60 @@ let lastClick;
 let trashBin = document.querySelector('#recycler');
 let browser = document.querySelector('#browser');
 let appOpened = false;
+let storage;
+var test;
+var newCopyY
+var newCopyX
 
 	function listenForKeys(e){
-		if ((e.key == 'Delete')&&(heldIcon !== trashBin)){
+		if (heldIcon !== trashBin){
+			if(e.key == "Delete"){
 			heldIcon.remove();
 			trashBin.children[0].style.backgroundImage = 'url(resources/img/RecycleFull.png)';
+			resetIcons();
+					setUpIcons();
+				}
+
+				if(e.key == "c"){
+					storage = heldIcon.cloneNode(true)
+				}
+				if((e.key == "v")&&(storage)){
+				icons.push(body.appendChild(storage));
+				let thisIcon = icons[icons.length-1];
+				clearIconClasses(thisIcon);
+					thisIcon.addEventListener('mousedown', hold);	
+					thisIcon.style.zIndex = '1';
+					newCopyY = thisIcon.offsetTop + 80;
+					newCopyX = thisIcon.offsetLeft;
+					if(newCopyY > body.offsetHeight){
+						newCopyX += 60;
+						newCopyY = 0;
+						if(newCopyX > body.offsetWidth){
+							newCopyX = 0;
+						}
+						thisIcon.style.left = `${newCopyX}px`
+					}
+					//console.log(newCopyY);
+					thisIcon.style.top = `${newCopyY}px`
+					newCopyY += 80;
+					storage = thisIcon.cloneNode(true)
+				}
+		}
+	}
+
+//TODO: Make function for pasting and add key combination CTRL + C & CTRL + V 
+
+	function clearIconClasses(icon){
+		if(icon){
+			icon.classList.remove('clickedIcon');
+			icon.children[0].children[0].classList.remove('clickedIconParagraph');
 		}
 	}
 
 function hold(e){
 	clicked = true;
-	if(heldIcon){
-		heldIcon.classList.remove('clickedIcon');
-		heldIconP.classList.remove('clickedIconParagraph');
-	}
+		clearIconClasses(heldIcon);
+
 	heldIconP = this.querySelector('p')	
 	heldIcon = this;
 	lastOffsetTop = this.offsetTop
@@ -54,7 +94,6 @@ function hold(e){
 
 
 function release(){
-	//	
 	if(timeoutClick) clearTimeout(timeoutClick)
 		var timeoutClick = setTimeout(function(){
 		lastClick = null;
@@ -71,7 +110,6 @@ function release(){
 
 function moveIcon(e){
 	if(!clicked){return}
-//	heldIcon.style.left = `${e.clientX - heldIcon.offsetWidth/2 - heldIcon.initPosX - (heldIcon.offsetWidth/2-heldIcon.offsetWidth + mousePosXIcon)-15}px`; 
 	console.log(e.clientY - heldIcon.offsetHeight/2)
 	heldIcon.style.top = `${e.clientY - heldIcon.offsetHeight/2}px`; 
 	heldIcon.style.left = `${e.clientX - heldIcon.offsetWidth/2}px`;	
@@ -85,7 +123,7 @@ function unmarkicon(){
 
 function unmark(e){		
 	if(document.getElementById('contextMenu')){document.getElementById('contextMenu').remove();}
-	if((e.target == pulpit)&&(heldIcon)){
+	if((e.target == body)&&(heldIcon)){
 		heldIcon.classList.remove('clickedIcon');
 		heldIconP.classList.remove('clickedIconParagraph');
 		heldIcon = null;
@@ -123,7 +161,7 @@ function context(e){
 	rightClickMenu.style.top = `${e.clientY}px`;
 	rightClickMenu.style.zIndex = 10;
 	rightClickMenu.setAttribute('id', 'contextMenu');
-	document.querySelector('body').appendChild(rightClickMenu);
+	body.appendChild(rightClickMenu);
 	console.log(e);
 }
 
@@ -131,8 +169,8 @@ function context(e){
 //id recycler context menu (bin)
 
 icons.forEach(icon =>{
+	body.addEventListener('mousedown', unmark);	
 	icon.addEventListener('mousedown', hold);	
-	document.querySelector('body').addEventListener('mousedown', unmark);	
 	icon['initPosY'] = icon.offsetTop;
 	icon['initPosX'] = icon.offsetLeft;
 	document.addEventListener('mouseup', release );	
@@ -141,9 +179,21 @@ icons.forEach(icon =>{
 	document.addEventListener('contextmenu', context);
 })
 
-icons.forEach(icon =>{
-	icon.style.position = 'absolute';
-	console.log(icon.initPosY);
-	icon.style.top = `${icon.initPosY}px`;
-	icon.style.left = `${icon.initPosX}px`;
-})
+
+function setUpIcons(){
+	icons.forEach(icon =>{
+		icon.style.position = 'absolute';
+		icon.style.top = `${icon.initPosY}px`;
+		icon.style.left = `${icon.initPosX}px`;
+	});
+};
+
+function resetIcons(){
+	icons.forEach(icon =>{
+		icon.style.position = 'static';
+		icon['initPosY'] = icon.offsetTop;
+		icon['initPosX'] = icon.offsetLeft;
+	});
+};
+
+setUpIcons();

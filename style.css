@@ -21,6 +21,10 @@ body{
 	br{
 			user-select:none;
 	}
+
+	.inlineblok{
+			display:inline-block !important;
+	}
 .icon{
 	margin-left:auto;
 	margin-right:auto;
@@ -56,8 +60,7 @@ body{
 }
 #recycle{
 	margin-top:4px;
-		background-image:url(resources/img/recycle.ico);
-	
+		background-image:url(resources/img/Recycle.ico);
 }
 
 #chrome{
