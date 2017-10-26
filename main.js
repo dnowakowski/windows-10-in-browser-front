@@ -28,8 +28,8 @@ let browser = document.querySelector('#browser');
 let appOpened = false;
 let storage;
 var test;
-var newCopyY
-var newCopyX
+let newCopyY
+let newCopyX
 
 	function listenForKeys(e){
 		if (heldIcon !== trashBin){
