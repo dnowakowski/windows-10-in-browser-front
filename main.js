@@ -1,7 +1,7 @@
 //coded by Damian Nowakowski
 
 //clock
-setInterval( function showtime(){
+setInterval( function clock(){
 var d = new Date();
 var hours= d.getHours();
 var minutes=d.getMinutes();
